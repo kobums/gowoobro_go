@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  backend:
+    restart: always
+    image: kobums/gowoobro
+    ports:
+      - "8007:8007"
+    volumes:
+      - /home/gowoobro/webdata:/usr/local/main/webdata
