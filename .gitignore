@@ -1,0 +1,15 @@
+
+# bin file
+/bin
+
+
+# local env file
+.env
+.env.yml
+
+# model.json
+# model.json
+model.json
+gowoobro.sql
+CLAUDE.md
+Makefile
