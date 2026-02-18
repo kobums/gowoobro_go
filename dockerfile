@@ -1,18 +1,36 @@
-FROM golang:1.25 AS builder
+FROM --platform=linux/amd64 golang:1.25-alpine AS builder
 
 WORKDIR /app
 
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-s' -o bin/gowoobro.linux main.go
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o main .
 
-FROM        alpine
+# Production stage
+FROM alpine:latest
 
-COPY --from=builder /app/bin/gowoobro.linux /usr/local/main/main
-COPY ./config/config.json.docker /usr/local/main/config/config.json
-CMD mkdir -p /usr/local/main/webdata
-#ADD ./assets /usr/local/main/assets
-#ADD ./views /usr/local/main/views
+RUN apk --no-cache add ca-certificates
 
-WORKDIR /usr/local/main
-CMD ./main
+WORKDIR /root/
+
+# Copy the binary from builder
+COPY --from=builder /app/main .
+
+# Copying .env.yml to the CURRENT working directory (/root/)
+COPY .env.yml .env.yml
+
+# Creating webdata directory in the CURRENT working directory
+RUN mkdir -p webdata
+
+
+ENV APP_MODE=production
+
+CMD ["./main"]
