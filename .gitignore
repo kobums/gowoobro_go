@@ -13,3 +13,5 @@ model.json
 gowoobro.sql
 CLAUDE.md
 Makefile
+.claude/*
+webdata/*
