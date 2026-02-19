@@ -48,4 +48,6 @@ func SetRouter(r *fiber.App) {
 	// Setup domain-specific routes
 	routers.SetupIpblockRoutes(apiGroup)
 	routers.SetupQuestionsRoutes(apiGroup)
+	routers.SetupProjectsRoutes(apiGroup)
+	routers.SetupUploadRoutes(apiGroup)
 }
