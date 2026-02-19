@@ -50,8 +50,8 @@ func Http() {
 	}))
 
 
-	app.Static("/", config.DocumentRoot)
-	//app.Static("/webdata", config.UploadPath)
+	// app.Static("/webdata", config.DocumentRoot)
+	app.Static("/webdata", config.UploadPath)
 
 	router.SetRouter(app)
 
