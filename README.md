@@ -26,7 +26,7 @@ Go의 빠른 실행 속도와 [Fiber](https://gofiber.io/) 프레임워크의 �
 |:---|:---|
 | 🗂️ **프로젝트 관리** | 포트폴리오 프로젝트 CRUD (웹/앱 구분, 스토어 링크, QR코드 등) |
 | 🛡️ **IP 추적** | 방문자 IP 기록 및 관리 |
-| 💬 **Q&A** | 방문자 질문 수집 및 관리 |
+| 💬 **Q&A** | 방문자 질문 수집 + 관리자 답변 시스템 (IP 기반 매핑) |
 | 📤 **파일 업로드** | 프로젝트 아이콘 등 파일 업로드 처리 |
 | 🔒 **TLS 지원** | 프로덕션 환경에서 HTTPS 지원 |
 | 🐳 **Docker 지원** | Multi-stage 빌드를 통한 경량 컨테이너 배포 |
@@ -55,7 +55,8 @@ gowoobrogo/
 │   ├── db.go               # 데이터베이스 연결
 │   ├── ipblock.go
 │   ├── projects.go
-│   └── questions.go
+│   ├── questions.go
+│   └── answers.go          # answers_tb — questions_tb.q_id FK, LEFT JOIN으로 질문 텍스트 포함
 ├── global/                 # 글로벌 유틸리티
 │   ├── config/             # 환경 설정
 │   ├── log/                # Zerolog 기반 로깅
@@ -99,11 +100,26 @@ gowoobrogo/
 
 | Method | Endpoint | 설명 |
 |:---:|:---|:---|
-| `GET` | `/api/questions` | 질문 목록 조회 |
+| `GET` | `/api/questions` | 질문 목록 조회 (`?address=` 로 IP 필터링) |
 | `GET` | `/api/questions/:id` | 특정 질문 조회 |
-| `POST` | `/api/questions` | 질문 등록 |
+| `POST` | `/api/questions` | 질문 등록 (address 미입력 시 요청 IP 자동 저장) |
+| `POST` | `/api/questions/count` | 질문 수 조회 |
 | `PUT` | `/api/questions` | 질문 수정 |
 | `DELETE` | `/api/questions` | 질문 삭제 |
+
+### 💡 Answers — `/api/answers`
+
+| Method | Endpoint | 설명 |
+|:---:|:---|:---|
+| `GET` | `/api/answers` | 답변 목록 조회 (`?address=` 로 IP 필터링) — `questionText` 포함 |
+| `GET` | `/api/answers/:id` | 특정 답변 조회 |
+| `POST` | `/api/answers` | 답변 등록 (`question` 필드에 `q_id` 입력) |
+| `POST` | `/api/answers/count` | 답변 수 조회 |
+| `PUT` | `/api/answers` | 답변 수정 |
+| `DELETE` | `/api/answers` | 답변 삭제 |
+
+> `answers_tb.a_question`은 `questions_tb.q_id`의 FK입니다.  
+> GET 응답에 `questionText` 필드가 자동으로 포함됩니다 (LEFT JOIN).
 
 ### 📤 Upload — `/api/upload`
 
