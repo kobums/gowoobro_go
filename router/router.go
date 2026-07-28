@@ -44,6 +44,8 @@ func SetRouter(r *fiber.App) {
 
 	// apiGroup.Use(JwtAuthRequired)
 
+	// ipblock_tb 에 등록된 IP 는 여기서 403 으로 끊는다.
+	apiGroup.Use(IpBlockGuard)
 
 	// Setup domain-specific routes
 	routers.SetupIpblockRoutes(apiGroup)

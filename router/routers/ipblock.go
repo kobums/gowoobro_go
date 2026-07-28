@@ -4,17 +4,21 @@ import (
 
 	"strconv"
 
-	"gowoobro/global/log"
-
 
 	"gowoobro/controllers/rest"
 
 
-	"gowoobro/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 // SetupIpblockRoutes sets up routes for ipblock domain
+//
+// ipblock_tb 는 차단 목록이다. 차단 IP 는 DB 에 직접 INSERT 로 넣고, API 로는
+// 조회만 한다 — 누구나 호출할 수 있는 쓰기 라우트를 열어두면 아무나 차단 목록을
+// 고칠 수 있기 때문이다.
+//
+// 주의: 이 파일은 gomachine 생성기 산출물이다. 생성기를 다시 돌리면 아래에서
+// 지운 POST/PUT/DELETE 라우트가 되살아나므로 다시 지워야 한다.
 func SetupIpblockRoutes(group fiber.Router) {
 
 	group.Get("/ipblock", func(c *fiber.Ctx) error {
@@ -36,77 +40,11 @@ func SetupIpblockRoutes(group fiber.Router) {
 		return c.JSON(controller.Result)
 	})
 
-	group.Post("/ipblock", func(c *fiber.Ctx) error {
-		item_ := &models.Ipblock{}
-		err := c.BodyParser(item_)
-		if err != nil {
-		    log.Error().Msg(err.Error())
-		}
-		var controller rest.IpblockController
-		controller.Init(c)
-		controller.Insert(item_)
-		controller.Close()
-		return c.JSON(controller.Result)
-	})
-
-	group.Post("/ipblock/batch", func(c *fiber.Ctx) error {
-		var items_ *[]models.Ipblock
-		items__ref := &items_
-		err := c.BodyParser(items__ref)
-		if err != nil {
-		    log.Error().Msg(err.Error())
-		}
-		var controller rest.IpblockController
-		controller.Init(c)
-		controller.Insertbatch(items_)
-		controller.Close()
-		return c.JSON(controller.Result)
-	})
-
 	group.Post("/ipblock/count", func(c *fiber.Ctx) error {
 
 		var controller rest.IpblockController
 		controller.Init(c)
 		controller.Count()
-		controller.Close()
-		return c.JSON(controller.Result)
-	})
-
-	group.Put("/ipblock", func(c *fiber.Ctx) error {
-		item_ := &models.Ipblock{}
-		err := c.BodyParser(item_)
-		if err != nil {
-		    log.Error().Msg(err.Error())
-		}
-		var controller rest.IpblockController
-		controller.Init(c)
-		controller.Update(item_)
-		controller.Close()
-		return c.JSON(controller.Result)
-	})
-
-	group.Delete("/ipblock", func(c *fiber.Ctx) error {
-		item_ := &models.Ipblock{}
-		err := c.BodyParser(item_)
-		if err != nil {
-		    log.Error().Msg(err.Error())
-		}
-		var controller rest.IpblockController
-		controller.Init(c)
-		controller.Delete(item_)
-		controller.Close()
-		return c.JSON(controller.Result)
-	})
-
-	group.Delete("/ipblock/batch", func(c *fiber.Ctx) error {
-		item_ := &[]models.Ipblock{}
-		err := c.BodyParser(item_)
-		if err != nil {
-		    log.Error().Msg(err.Error())
-		}
-		var controller rest.IpblockController
-		controller.Init(c)
-		controller.Deletebatch(item_)
 		controller.Close()
 		return c.JSON(controller.Result)
 	})

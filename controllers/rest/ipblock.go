@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+// IpblockController 는 차단 IP 목록(ipblock_tb)의 조회만 담당한다.
+//
+// 차단 IP 는 DB 에 직접 INSERT 로 넣는다. 인증 없는 쓰기 엔드포인트를 열어두면
+// 아무나 차단 목록을 고칠 수 있어서 Insert/Update/Delete 계열은 전부 제거했다.
+//
+// 주의: 이 파일은 gomachine 생성기 산출물이다. 생성기를 다시 돌리면 쓰기
+// 메서드가 되살아나므로 다시 지워야 한다.
 type IpblockController struct {
 	controllers.Controller
 }
@@ -125,101 +132,3 @@ func (c *IpblockController) Count() {
     total := manager.Count(args)
 	c.Set("total", total)
 }
-
-func (c *IpblockController) Insert(item *models.Ipblock) {
-    
-    
-	conn := c.NewConnection()
-    
-    if item.Address == "" {
-        item.Address = c.Context.IP()
-    }
-
-	manager := models.NewIpblockManager(conn)
-	err := manager.Insert(item)
-    if err != nil {
-        c.Set("code", "error")    
-        c.Set("error", err)
-        return
-    }
-
-    id := manager.GetIdentity()
-    c.Result["id"] = id
-    item.Id = id
-}
-
-func (c *IpblockController) Insertbatch(item *[]models.Ipblock) {  
-    if item == nil || len(*item) == 0 {
-        return
-    }
-
-    rows := len(*item)
-    
-    
-    
-	conn := c.NewConnection()
-    
-	manager := models.NewIpblockManager(conn)
-
-    for i := 0; i < rows; i++ {
-        if ((*item)[i]).Address == "" {
-            ((*item)[i]).Address = c.Context.IP()
-        }
-	    err := manager.Insert(&((*item)[i]))
-        if err != nil {
-            c.Set("code", "error")    
-            c.Set("error", err)
-            return
-        }
-    }
-}
-
-func (c *IpblockController) Update(item *models.Ipblock) {
-    
-    
-	conn := c.NewConnection()
-
-	manager := models.NewIpblockManager(conn)
-    err := manager.Update(item)
-    if err != nil {
-        c.Set("code", "error")    
-        c.Set("error", err)
-        return
-    }
-}
-
-func (c *IpblockController) Delete(item *models.Ipblock) {
-    
-    
-    conn := c.NewConnection()
-
-	manager := models.NewIpblockManager(conn)
-
-    
-	err := manager.Delete(item.Id)
-    if err != nil {
-        c.Set("code", "error")    
-        c.Set("error", err)
-    }
-}
-
-func (c *IpblockController) Deletebatch(item *[]models.Ipblock) {
-    
-    
-    conn := c.NewConnection()
-
-	manager := models.NewIpblockManager(conn)
-
-    for _, v := range *item {
-        
-    
-	    err := manager.Delete(v.Id)
-        if err != nil {
-            c.Set("code", "error")    
-            c.Set("error", err)
-            return
-        }
-    }
-}
-
-
