@@ -17,9 +17,10 @@ import (
 
 type Ipblock struct {
             
-    Id                int64 `json:"id"`         
-    Address                string `json:"address"`         
-    Date                string `json:"date"` 
+    Id                int64 `json:"id"`
+    Address                string `json:"address"`
+    Reason                string `json:"reason"`
+    Date                string `json:"date"`
     
     Extra                    map[string]interface{} `json:"extra"`
 }
@@ -113,7 +114,7 @@ func (p *IpblockManager) GetQuery() string {
 
     var ret strings.Builder
 
-    ret.WriteString("select ib_id, ib_address, ib_date from ipblock_tb")
+    ret.WriteString("select ib_id, ib_address, ib_reason, ib_date from ipblock_tb")
 
     if p.Index != "" {
         ret.WriteString(" use index(")
@@ -218,11 +219,11 @@ func (p *IpblockManager) Insert(item *Ipblock) error {
     var res sql.Result
     var err error
     if item.Id > 0 {
-        query = "insert into ipblock_tb (ib_id, ib_address, ib_date) values (?, ?, ?)"
-        res, err = p.Exec(query, item.Id, item.Address, item.Date)
+        query = "insert into ipblock_tb (ib_id, ib_address, ib_reason, ib_date) values (?, ?, ?, ?)"
+        res, err = p.Exec(query, item.Id, item.Address, item.Reason, item.Date)
     } else {
-        query = "insert into ipblock_tb (ib_address, ib_date) values (?, ?)"
-        res, err = p.Exec(query, item.Address, item.Date)
+        query = "insert into ipblock_tb (ib_address, ib_reason, ib_date) values (?, ?, ?)"
+        res, err = p.Exec(query, item.Address, item.Reason, item.Date)
     }
     
     if err == nil {
@@ -373,8 +374,8 @@ func (p *IpblockManager) Update(item *Ipblock) error {
     }
 	
 
-	query := "update ipblock_tb set ib_address = ?, ib_date = ? where ib_id = ?"
-	_, err := p.Exec(query, item.Address, item.Date, item.Id)
+	query := "update ipblock_tb set ib_address = ?, ib_reason = ?, ib_date = ? where ib_id = ?"
+	_, err := p.Exec(query, item.Address, item.Reason, item.Date, item.Id)
 
     if err != nil {
         if p.Log {
@@ -405,6 +406,9 @@ func (p *IpblockManager) UpdateWhere(columns []ipblock.Params, args []interface{
         initParams = append(initParams, v.Value)
         } else if v.Column == ipblock.ColumnAddress {
         initQuery.WriteString("ib_address = ?")
+        initParams = append(initParams, v.Value)
+        } else if v.Column == ipblock.ColumnReason {
+        initQuery.WriteString("ib_reason = ?")
         initParams = append(initParams, v.Value)
         } else if v.Column == ipblock.ColumnDate {
         initQuery.WriteString("ib_date = ?")
@@ -499,7 +503,7 @@ func (p *IpblockManager) ReadRow(rows *sql.Rows) *Ipblock {
     
 
     if rows.Next() {
-        err = rows.Scan(&item.Id, &item.Address, &item.Date)
+        err = rows.Scan(&item.Id, &item.Address, &item.Reason, &item.Date)
         
         if item.Date == "0000-00-00 00:00:00" || item.Date == "1000-01-01 00:00:00" || item.Date == "9999-01-01 00:00:00" {
             item.Date = ""
@@ -534,7 +538,7 @@ func (p *IpblockManager) ReadRows(rows *sql.Rows) []Ipblock {
         var item Ipblock
         
 
-        err := rows.Scan(&item.Id, &item.Address, &item.Date)
+        err := rows.Scan(&item.Id, &item.Address, &item.Reason, &item.Date)
         if err != nil {
            if p.Log {
              log.Error().Str("error", err.Error()).Msg("SQL")

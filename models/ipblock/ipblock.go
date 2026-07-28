@@ -7,6 +7,7 @@ const (
     
     ColumnId
     ColumnAddress
+    ColumnReason
     ColumnDate
 )
 

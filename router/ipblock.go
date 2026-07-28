@@ -25,9 +25,16 @@ import (
 // 즉 DB 에 넣은 차단이 실제로 걸리기까지 최대 blocklistTTL 만큼 걸린다.
 const blocklistTTL = 60 * time.Second
 
+// blockRule 은 차단 규칙 한 줄이다. Reason 은 막힌 사람에게 그대로 보여주므로
+// 방문자가 읽을 문장으로 적어야 한다.
+type blockRule struct {
+	IP     *setting.IP
+	Reason string
+}
+
 type blocklistCache struct {
 	mutex    sync.RWMutex
-	entries  []*setting.IP
+	entries  []blockRule
 	loadedAt time.Time
 	loaded   bool
 }
@@ -35,7 +42,7 @@ type blocklistCache struct {
 var blocklist blocklistCache
 
 // Entries 는 캐시가 유효하면 그대로, 만료됐으면 DB 에서 다시 읽어 반환한다.
-func (c *blocklistCache) Entries() []*setting.IP {
+func (c *blocklistCache) Entries() []blockRule {
 	c.mutex.RLock()
 	if c.loaded && time.Since(c.loadedAt) < blocklistTTL {
 		cached := c.entries
@@ -67,7 +74,7 @@ func (c *blocklistCache) Entries() []*setting.IP {
 	return c.entries
 }
 
-func loadBlocklist() ([]*setting.IP, error) {
+func loadBlocklist() ([]blockRule, error) {
 	conn := models.NewConnection()
 	if conn == nil || !conn.IsConnect() {
 		return nil, errors.New("database connection error")
@@ -83,7 +90,7 @@ func loadBlocklist() ([]*setting.IP, error) {
 
 	manager := models.NewIpblockManager(conn)
 
-	var entries []*setting.IP
+	var entries []blockRule
 	for _, item := range manager.FindAll() {
 		address := strings.TrimSpace(item.Address)
 		if address == "" {
@@ -97,7 +104,7 @@ func loadBlocklist() ([]*setting.IP, error) {
 			continue
 		}
 
-		entries = append(entries, entry)
+		entries = append(entries, blockRule{IP: entry, Reason: strings.TrimSpace(item.Reason)})
 	}
 
 	return entries, nil
@@ -140,20 +147,24 @@ func IpBlockGuard(c *fiber.Ctx) error {
 		return c.Next()
 	}
 
-	for _, entry := range blocklist.Entries() {
-		if !entry.Contains(ip) {
+	for _, rule := range blocklist.Entries() {
+		if !rule.IP.Contains(ip) {
 			continue
 		}
 
 		log.Info().
 			Str("address", address).
-			Str("rule", entry.Address).
+			Str("rule", rule.IP.Address).
+			Str("reason", rule.Reason).
 			Str("path", c.Path()).
 			Msg("ipblock: access denied")
 
+		// reason 은 막힌 사람에게 그대로 보여준다. 비어 있으면 프론트가 기존
+		// 일반 오류 문구로 대체하도록 빈 문자열을 그대로 내려보낸다.
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"code":    "error",
 			"message": "access denied",
+			"reason":  rule.Reason,
 		})
 	}
 
