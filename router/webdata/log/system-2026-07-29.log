@@ -1,0 +1,7 @@
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"10.1.2.3","rule":"10.0.0.0/8","reason":"차단됨","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"192.168.1.15","rule":"192.168.1.10-20","reason":"차단됨","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"스팸 질문 반복 등록","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"","path":"/api/projects","time":"2026-07-29T11:33:40+09:00","message":"ipblock: access denied"}

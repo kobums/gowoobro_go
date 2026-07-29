@@ -174,6 +174,17 @@ func Init() {
 		Port = envPort
 	}
 
+	// 업로드 경로도 .env.yml 에만 있던 값이다. 운영에서는 마운트된 볼륨
+	// (/usr/local/main/webdata) 을 가리켜야 한다. 이게 비어 상대경로 "webdata"
+	// 로 떨어지면 업로드 파일이 컨테이너 안에만 쌓였다가 재배포 때 사라진다.
+	if envUploadPath := os.Getenv("UPLOAD_PATH"); envUploadPath != "" {
+		UploadPath = envUploadPath
+	}
+
+	if envDocumentRoot := os.Getenv("DOCUMENT_ROOT"); envDocumentRoot != "" {
+		DocumentRoot = envDocumentRoot
+	}
+
 	// CORS 는 원래 .env.yml 에만 있어서, 그 파일 하나 때문에 이미지에 설정을
 	// 구워 넣어야 했다. 프론트(gowoobro.com)와 API(gowoobroapi.gowoobro.com)가
 	// 서로 다른 오리진이라 이 목록이 비면 CORS 미들웨어가 아예 안 붙고
