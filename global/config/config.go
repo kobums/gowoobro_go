@@ -300,6 +300,14 @@ func Init() {
 		}
 
 		Database.Type = Mysql
+
+		// TypeString 은 sql.Open 에 그대로 넘어가는 드라이버 이름이다(models/db.go).
+		// 이 분기는 이미 MySQL 로 판정했는데 TypeString 이 비어 있으면
+		// sql.Open("") 이 되어 `unknown driver ""` 로 죽는다. .env.yml 을 쓰던
+		// 시절엔 YAML 에 type 이 적혀 있어 드러나지 않던 구멍이다.
+		if Database.TypeString == "" {
+			Database.TypeString = "mysql"
+		}
 	}
 
 	if Database.ConnectionString == "" {
