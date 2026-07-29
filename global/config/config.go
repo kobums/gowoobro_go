@@ -174,6 +174,22 @@ func Init() {
 		Port = envPort
 	}
 
+	// CORS 는 원래 .env.yml 에만 있어서, 그 파일 하나 때문에 이미지에 설정을
+	// 구워 넣어야 했다. 프론트(gowoobro.com)와 API(gowoobroapi.gowoobro.com)가
+	// 서로 다른 오리진이라 이 목록이 비면 CORS 미들웨어가 아예 안 붙고
+	// (services/http.go) 브라우저가 API 호출을 전부 막는다.
+	//
+	// tomelater/tomelatergo/config.go 와 같은 방식으로 콤마 구분 환경변수를 받는다.
+	//   CORS=https://gowoobro.com,https://www.gowoobro.com
+	if envCors := os.Getenv("CORS"); envCors != "" {
+		Cors = nil
+		for _, site := range strings.Split(envCors, ",") {
+			if site = strings.TrimSpace(site); site != "" {
+				Cors = append(Cors, site)
+			}
+		}
+	}
+
 	envLogLevel := os.Getenv("LOG_LEVEL")
 	envLogConsole := os.Getenv("LOG_CONSOLE")
 	envLogWeb := os.Getenv("LOG_WEB")
