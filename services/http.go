@@ -38,7 +38,10 @@ func Http() {
 			AllowOrigins:     sites,
 			AllowCredentials: true,
 			AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
-			AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
+			// Authorization 이 빠지면 관리자 화면이 통째로 막힌다. 이 헤더를 붙이는
+			// 순간 요청이 프리플라이트 대상이 되는데, 허용 목록에 없으면 브라우저가
+			// 본 요청을 아예 보내지 않는다. curl 은 CORS 를 지키지 않아 드러나지 않는다.
+			AllowHeaders: "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin,Authorization",
 		}))
 	}
 
@@ -51,7 +54,6 @@ func Http() {
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestCompression,
 	}))
-
 
 	// app.Static("/webdata", config.DocumentRoot)
 	app.Static("/webdata", config.UploadPath)
