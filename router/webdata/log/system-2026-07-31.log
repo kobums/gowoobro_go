@@ -1,0 +1,56 @@
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:51+09:00","message":"auth: 관리자 로그인 실패"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:51+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:51+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:51+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"error","time":"2026-07-31T23:51:51+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:51:51+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:51:51+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"10.1.2.3","rule":"10.0.0.0/8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"192.168.1.15","rule":"192.168.1.10-20","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"스팸 질문 반복 등록","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"","path":"/api/projects","time":"2026-07-31T23:51:51+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 실패"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"error","time":"2026-07-31T23:51:57+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:51:57+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:51:57+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"10.1.2.3","rule":"10.0.0.0/8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"192.168.1.15","rule":"192.168.1.10-20","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"스팸 질문 반복 등록","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 실패"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:51:57+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"error","time":"2026-07-31T23:51:57+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:51:57+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:51:57+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"10.1.2.3","rule":"10.0.0.0/8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"192.168.1.15","rule":"192.168.1.10-20","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"스팸 질문 반복 등록","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"","path":"/api/projects","time":"2026-07-31T23:51:57+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:53:49+09:00","message":"auth: 관리자 로그인 실패"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:53:49+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:53:49+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"info","address":"0.0.0.0","time":"2026-07-31T23:53:49+09:00","message":"auth: 관리자 로그인 성공"}
+{"level":"error","time":"2026-07-31T23:53:49+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:53:49+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"error","time":"2026-07-31T23:53:49+09:00","message":"auth: JWT_SECRET 또는 ADMIN_PASSWORD 가 없어 로그인을 거부했다"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"10.1.2.3","rule":"10.0.0.0/8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"192.168.1.15","rule":"192.168.1.10-20","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"차단됨","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"스팸 질문 반복 등록","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}
+{"level":"info","address":"8.8.8.8","rule":"8.8.8.8","reason":"","path":"/api/projects","time":"2026-07-31T23:53:49+09:00","message":"ipblock: access denied"}

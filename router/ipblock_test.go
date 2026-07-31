@@ -258,3 +258,13 @@ func TestClientIPPrefersRealIP(t *testing.T) {
 		})
 	}
 }
+
+// seedEmptyBlocklist 는 차단 목록을 비운 상태로 캐시를 채운다. 인증 테스트가
+// DB 를 타지 않게 하려는 용도다.
+func seedEmptyBlocklist() {
+	blocklist.mutex.Lock()
+	blocklist.entries = nil
+	blocklist.loadedAt = time.Now()
+	blocklist.loaded = true
+	blocklist.mutex.Unlock()
+}

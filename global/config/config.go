@@ -96,6 +96,11 @@ var _value map[string]interface{}
 
 var CrawlerId string
 
+// 관리자 인증. 둘 다 환경변수로만 받는다 — 기본값을 두면 그 값을 아는 사람이
+// 누구나 관리자가 되므로, 비어 있으면 로그인 자체를 거부한다(router/auth.go).
+var JwtSecret string
+var AdminPassword string
+
 func Init() {
 	config := &Config{}
 	obj := make(map[string]interface{})
@@ -329,6 +334,19 @@ func Init() {
 		} else {
 			Database.ConnectionString = fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", Database.User, Database.Password, Database.Host, Database.Port, Database.Name)
 		}
+	}
+
+	JwtSecret = os.Getenv("JWT_SECRET")
+	AdminPassword = os.Getenv("ADMIN_PASSWORD")
+
+	// 여기서 기동을 막지는 않는다. 이 사이트는 대부분이 공개 페이지라, 관리자
+	// 인증 설정이 빠졌다고 공개 사이트까지 죽이는 건 과하다. 대신 로그로 크게
+	// 알리고 로그인만 거부한다.
+	if JwtSecret == "" {
+		log.Println("[warn] JWT_SECRET 이 없다. 관리자 로그인이 비활성화된다.")
+	}
+	if AdminPassword == "" {
+		log.Println("[warn] ADMIN_PASSWORD 가 없다. 관리자 로그인이 비활성화된다.")
 	}
 
 	Version = config.Version
