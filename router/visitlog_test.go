@@ -200,6 +200,21 @@ func TestParseAgent(t *testing.T) {
 	}
 }
 
+func TestVisitLogSkipsInternalIP(t *testing.T) {
+	recorder := &visitRecorder{}
+	app := newVisitApp(t, recorder)
+
+	// 도커 브리지 게이트웨이(SSR fetch), 컨테이너 IP, 로컬 개발 순.
+	visitRequest(t, app, "172.22.0.1", "axios/1.11.0")
+	visitRequest(t, app, "172.22.0.5", "axios/1.11.0")
+	visitRequest(t, app, "127.0.0.1", chromeAgent)
+
+	records, notifies := recorder.counts()
+	if records != 0 || notifies != 0 {
+		t.Fatalf("records=%d notifies=%d, want 0/0 (내부 IP 는 방문이 아니다)", records, notifies)
+	}
+}
+
 func TestVisitLogSkipsPreflight(t *testing.T) {
 	recorder := &visitRecorder{}
 	app := newVisitApp(t, recorder)

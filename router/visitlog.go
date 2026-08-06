@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"net/netip"
 	"strings"
 	"sync"
 	"time"
@@ -135,6 +136,17 @@ var notifyVisit = func(item models.Iplog) {
 	}()
 }
 
+// isInternalIP 는 사설 대역(RFC 1918)·루프백 주소인지 판정한다. gowoobro_web
+// 컨테이너의 SSR fetch 가 도커 네트워크 IP(172.22.x.x)로 들어오는데, 이건 방문이
+// 아니라 우리 서버끼리의 통신이므로 방문 로그에서 걸러내기 위해 쓴다.
+func isInternalIP(address string) bool {
+	addr, err := netip.ParseAddr(address)
+	if err != nil {
+		return false
+	}
+	return addr.IsPrivate() || addr.IsLoopback()
+}
+
 // VisitLog 는 요청마다 방문자 IP 를 iplog_tb 에 적재하고, 사람 방문이면 ntfy 로
 // 푸시 알림을 보낸다. 응답을 기다리게 하지 않도록 둘 다 비동기로 한다.
 func VisitLog(c *fiber.Ctx) error {
@@ -145,6 +157,12 @@ func VisitLog(c *fiber.Ctx) error {
 
 	address := clientIP(c)
 	if address == "" {
+		return c.Next()
+	}
+
+	// 내부 트래픽(SSR fetch, 로컬 개발)은 적재도 알림도 하지 않는다. 실제 방문은
+	// 방문자 브라우저가 직접 보내는 API 호출로 이미 잡힌다.
+	if isInternalIP(address) {
 		return c.Next()
 	}
 
