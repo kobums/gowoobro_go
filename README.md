@@ -54,6 +54,7 @@ gowoobrogo/
 ├── models/                 # 데이터 모델 및 DB 접근 계층
 │   ├── db.go               # 데이터베이스 연결
 │   ├── ipblock.go
+│   ├── iplog.go            # iplog_tb — 방문자 IP 적재 (router/visitlog.go 미들웨어가 사용)
 │   ├── projects.go
 │   ├── questions.go
 │   └── answers.go          # answers_tb — questions_tb.q_id FK, LEFT JOIN으로 질문 텍스트 포함

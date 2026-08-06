@@ -50,6 +50,10 @@ func SetRouter(r *fiber.App) {
 	// 시도조차 못 하도록 인증보다 앞에 둔다.
 	apiGroup.Use(IpBlockGuard)
 
+	// 방문자 IP 를 iplog_tb 에 적재한다. 차단 IP 의 시도는 IpBlockGuard 가 이미
+	// 앱 로그로 남기므로, 실제로 서비스된 방문만 기록하도록 가드 뒤에 둔다.
+	apiGroup.Use(VisitLog)
+
 	// 관리자 토큰 검사. isPublicPath 에 적힌 것만 통과하고 나머지는 401 이다.
 	apiGroup.Use(JwtAuthRequired)
 
