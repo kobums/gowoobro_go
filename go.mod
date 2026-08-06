@@ -11,6 +11,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.11
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/lib/pq v1.11.2
+	github.com/mileusna/useragent v1.3.5
 	github.com/rs/zerolog v1.34.0
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a

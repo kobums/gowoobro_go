@@ -21,6 +21,8 @@ type Iplog struct {
 	Address string `json:"address"`
 	Path    string `json:"path"`
 	Agent   string `json:"agent"`
+	Os      string `json:"os"`
+	Browser string `json:"browser"`
 	Date    string `json:"date"`
 }
 
@@ -60,7 +62,7 @@ func (p *IplogManager) Insert(item *Iplog) error {
 		item.Date = fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	}
 
-	// 컬럼이 VARCHAR(255) 라 넘치면 insert 자체가 실패한다. User-Agent 는
+	// 컬럼 길이를 넘치면 insert 자체가 실패한다. User-Agent 와 그 파생값은
 	// 클라이언트가 마음대로 보내는 값이라 길이를 믿을 수 없다.
 	if len(item.Path) > 255 {
 		item.Path = item.Path[:255]
@@ -68,14 +70,20 @@ func (p *IplogManager) Insert(item *Iplog) error {
 	if len(item.Agent) > 255 {
 		item.Agent = item.Agent[:255]
 	}
-
-	query := "insert into iplog_tb (il_address, il_path, il_agent, il_date) values (?, ?, ?, ?)"
-
-	if p.Log {
-		log.Debug().Str("query", query).Any("param", []interface{}{item.Address, item.Path, item.Agent, item.Date}).Msg("SQL")
+	if len(item.Os) > 50 {
+		item.Os = item.Os[:50]
+	}
+	if len(item.Browser) > 50 {
+		item.Browser = item.Browser[:50]
 	}
 
-	res, err := p.Conn.Exec(query, item.Address, item.Path, item.Agent, item.Date)
+	query := "insert into iplog_tb (il_address, il_path, il_agent, il_os, il_browser, il_date) values (?, ?, ?, ?, ?, ?)"
+
+	if p.Log {
+		log.Debug().Str("query", query).Any("param", []interface{}{item.Address, item.Path, item.Agent, item.Os, item.Browser, item.Date}).Msg("SQL")
+	}
+
+	res, err := p.Conn.Exec(query, item.Address, item.Path, item.Agent, item.Os, item.Browser, item.Date)
 	if err != nil {
 		if p.Log {
 			log.Error().Str("error", err.Error()).Msg("SQL")
