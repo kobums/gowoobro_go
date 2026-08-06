@@ -16,3 +16,4 @@ Makefile
 .claude/*
 webdata/*
 postman.json
+**/webdata/
