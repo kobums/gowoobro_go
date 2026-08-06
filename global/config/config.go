@@ -101,6 +101,11 @@ var CrawlerId string
 var JwtSecret string
 var AdminPassword string
 
+// 방문 알림용 ntfy.sh topic 이름. topic 이름을 아는 사람은 누구나 그 topic 을
+// 구독·발행할 수 있으므로 시크릿처럼 환경변수로만 받는다. 비어 있으면 방문
+// 알림을 보내지 않는다(적재는 그대로 된다).
+var NtfyTopic string
+
 func Init() {
 	config := &Config{}
 	obj := make(map[string]interface{})
@@ -338,6 +343,7 @@ func Init() {
 
 	JwtSecret = os.Getenv("JWT_SECRET")
 	AdminPassword = os.Getenv("ADMIN_PASSWORD")
+	NtfyTopic = os.Getenv("NTFY_TOPIC")
 
 	// 여기서 기동을 막지는 않는다. 이 사이트는 대부분이 공개 페이지라, 관리자
 	// 인증 설정이 빠졌다고 공개 사이트까지 죽이는 건 과하다. 대신 로그로 크게
