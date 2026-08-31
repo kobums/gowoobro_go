@@ -101,8 +101,8 @@ var CrawlerId string
 var JwtSecret string
 var AdminPassword string
 
-// 방문 알림용 ntfy.sh topic 이름. topic 이름을 아는 사람은 누구나 그 topic 을
-// 구독·발행할 수 있으므로 시크릿처럼 환경변수로만 받는다. 비어 있으면 방문
+// 방문·질문 접수 알림용 ntfy.sh topic 이름. topic 이름을 아는 사람은 누구나 그
+// topic 을 구독·발행할 수 있으므로 시크릿처럼 환경변수로만 받는다. 비어 있으면
 // 알림을 보내지 않는다(적재는 그대로 된다).
 var NtfyTopic string
 

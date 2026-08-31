@@ -2,6 +2,7 @@ package rest
 
 import (
 	"gowoobro/controllers"
+	"gowoobro/global/ntfy"
 	"gowoobro/models"
 
 	"strings"
@@ -155,6 +156,21 @@ func (c *QuestionsController) Insert(item *models.Questions) {
     id := manager.GetIdentity()
     c.Result["id"] = id
     item.Id = id
+
+    notifyQuestion(*item)
+}
+
+// notifyQuestion 은 방문자 질문이 접수되면 방문 알림과 같은 ntfy 채널로 알린다.
+// 발송이 접수 응답을 막으면 안 되므로 고루틴으로 보낸다.
+var notifyQuestion = func(item models.Questions) {
+	go func() {
+		question := item.Question
+		// 알림은 미리보기 용도라 너무 길면 자른다. 전문은 관리자 페이지에서 본다.
+		if runes := []rune(question); len(runes) > 200 {
+			question = string(runes[:200]) + "…"
+		}
+		ntfy.Send("gowoobro 새 질문", question+"\n— "+item.Address, []string{"speech_balloon"})
+	}()
 }
 
 func (c *QuestionsController) Insertbatch(item *[]models.Questions) {  
