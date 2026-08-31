@@ -1,16 +1,13 @@
 package router
 
 import (
-	"bytes"
-	"encoding/json"
-	"net/http"
 	"net/netip"
 	"strings"
 	"sync"
 	"time"
 
-	"gowoobro/global/config"
 	"gowoobro/global/log"
+	"gowoobro/global/ntfy"
 	"gowoobro/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -97,17 +94,9 @@ var recordVisit = func(item models.Iplog) {
 	}()
 }
 
-var ntfyClient = &http.Client{Timeout: 10 * time.Second}
-
-// notifyVisit 는 ntfy.sh 로 방문 알림을 보낸다. topic 이름이 곧 인증이므로
-// (아는 사람은 누구나 구독 가능) NTFY_TOPIC 환경변수로만 받고, 없으면 아무것도
-// 하지 않는다. 테스트에서 실제 발송 없이 검증할 수 있도록 변수로 뒀다.
+// notifyVisit 는 ntfy.sh 로 방문 알림을 보낸다(발송 자체는 global/ntfy).
+// 테스트에서 실제 발송 없이 검증할 수 있도록 변수로 뒀다.
 var notifyVisit = func(item models.Iplog) {
-	topic := config.NtfyTopic
-	if topic == "" {
-		return
-	}
-
 	go func() {
 		detail := item.Address
 		if item.Os != "" || item.Browser != "" {
@@ -115,24 +104,7 @@ var notifyVisit = func(item models.Iplog) {
 		}
 		detail += "\n" + item.Path
 
-		// 제목에 한글을 쓰려면 HTTP 헤더 대신 JSON 발행을 써야 한다
-		// (헤더는 ASCII 만 안전하다).
-		payload, err := json.Marshal(map[string]interface{}{
-			"topic":   topic,
-			"title":   "gowoobro 방문",
-			"message": detail,
-			"tags":    []string{"eyes"},
-		})
-		if err != nil {
-			return
-		}
-
-		resp, err := ntfyClient.Post("https://ntfy.sh", "application/json", bytes.NewReader(payload))
-		if err != nil {
-			log.Error().Str("error", err.Error()).Msg("visitlog: ntfy send failed")
-			return
-		}
-		resp.Body.Close()
+		ntfy.Send("gowoobro 방문", detail, []string{"eyes"})
 	}()
 }
 
