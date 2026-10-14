@@ -57,6 +57,9 @@ func SetRouter(r *fiber.App) {
 	// 관리자 토큰 검사. isPublicPath 에 적힌 것만 통과하고 나머지는 401 이다.
 	apiGroup.Use(JwtAuthRequired)
 
+	// 공개 경로의 조회·등록 범위를 방문자 자신의 IP 로 묶는다.
+	apiGroup.Use(VisitorScope)
+
 	// 로그인은 서버가 비밀번호를 판정하므로 무차별 대입이 가능하다. 특히 짧은
 	// 비밀번호면 전수 조사가 금방 끝난다. IP 당 시도 횟수를 묶어둔다.
 	apiGroup.Post("/login", limiter.New(limiter.Config{
@@ -72,6 +75,23 @@ func SetRouter(r *fiber.App) {
 			})
 		},
 	}), Login)
+
+	// 질문 등록은 토큰 없이 열려 있고 접수될 때마다 ntfy 알림이 나간다. 묶어두지
+	// 않으면 반복 호출만으로 DB 와 알림이 도배된다. 관리자 요청은 세지 않는다.
+	apiGroup.Post("/questions", limiter.New(limiter.Config{
+		Max:        5,
+		Expiration: 10 * time.Minute,
+		Next:       hasAdminToken,
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return clientIP(c)
+		},
+		LimitReached: func(c *fiber.Ctx) error {
+			log.Info().Str("address", clientIP(c)).Msg("questions: 질문 등록 제한 초과")
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"code": "error", "message": "too many questions",
+			})
+		},
+	}))
 
 	// Setup domain-specific routes
 	routers.SetupIpblockRoutes(apiGroup)

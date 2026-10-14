@@ -27,6 +27,10 @@ func (c *AnswersController) Index(page int, pagesize int) {
 	var args []interface{}
 
 	_address := c.Get("address")
+	// 방문자는 자기 IP 의 답변만 본다. address 를 빼거나 남의 IP 를 넣어도 무시한다.
+	if visitor := c.VisitorAddress(); visitor != "" {
+		_address = visitor
+	}
 	if _address != "" {
 		args = append(args, models.Where{Column: "address", Value: _address, Compare: "="})
 	}

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"gowoobro/controllers"
 	"gowoobro/global/config"
 	"gowoobro/global/log"
 
@@ -161,24 +162,40 @@ func JwtAuthRequired(c *fiber.Ctx) error {
 		})
 	}
 
-	if !authConfigured() {
+	if !hasAdminToken(c) {
 		return deny()
+	}
+
+	return c.Next()
+}
+
+// hasAdminToken 은 요청에 유효한 관리자 토큰이 실려 있는지 본다.
+func hasAdminToken(c *fiber.Ctx) bool {
+	if !authConfigured() {
+		return false
 	}
 
 	header := c.Get("Authorization")
 	if header == "" {
-		return deny()
+		return false
 	}
 
 	// "Bearer <token>" 만 받는다.
 	parts := strings.Fields(header)
 	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
-		return deny()
+		return false
 	}
 
 	claims, err := parseToken(parts[1])
-	if err != nil || claims.Role != "admin" {
-		return deny()
+	return err == nil && claims.Role == "admin"
+}
+
+// VisitorScope 는 토큰 없이 들어온 요청에 방문자 IP 를 심어둔다. 공개 경로는
+// 누구나 부를 수 있어서, 컨트롤러가 이 값으로 "자기 것"의 범위를 강제한다
+// (controllers.Controller.VisitorAddress). 관리자 요청에는 심지 않는다.
+func VisitorScope(c *fiber.Ctx) error {
+	if !hasAdminToken(c) {
+		c.Locals(controllers.VisitorAddressKey, clientIP(c))
 	}
 
 	return c.Next()

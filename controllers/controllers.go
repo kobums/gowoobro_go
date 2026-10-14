@@ -36,6 +36,18 @@ type Controller struct {
 	IsLock   bool
 }
 
+// VisitorAddressKey 는 router.VisitorScope 가 토큰 없는 요청에 심어두는 Locals
+// 키다. 값은 서버가 판정한 방문자 IP.
+const VisitorAddressKey = "visitorAddress"
+
+// VisitorAddress 는 관리자가 아닌 방문자의 요청이면 그 IP 를, 관리자 요청이면
+// 빈 문자열을 돌려준다. 방문자가 보낸 address 값은 믿을 수 없으므로(다른 사람
+// IP 를 적어 남의 답변을 볼 수 있다) 공개 API 는 이 값으로 덮어써야 한다.
+func (c *Controller) VisitorAddress() string {
+	address, _ := c.Context.Locals(VisitorAddressKey).(string)
+	return address
+}
+
 func NewController(g *fiber.Ctx) *Controller {
 	var ctl Controller
 	ctl.Init(g)

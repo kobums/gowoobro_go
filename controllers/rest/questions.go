@@ -141,6 +141,11 @@ func (c *QuestionsController) Insert(item *models.Questions) {
     
 	conn := c.NewConnection()
     
+    // 답변 조회가 서버가 본 IP 로 걸러지므로, 질문도 같은 IP 로 적재해야 짝이 맞는다.
+    if visitor := c.VisitorAddress(); visitor != "" {
+        item.Address = visitor
+    }
+
     if item.Address == "" {
         item.Address = c.Context.IP()
     }
