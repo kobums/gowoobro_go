@@ -5,6 +5,7 @@
 -- il_agent   : User-Agent 원문. 봇/크롤러와 실제 방문 구분용.
 -- il_os      : User-Agent 에서 파싱한 OS ("Windows 10", "iOS 17.5" 등). 통계용.
 -- il_browser : User-Agent 에서 파싱한 브라우저/봇 ("Chrome 126", "Googlebot 2" 등).
+-- il_country~il_as : ip-api 지오로케이션 (영문). 봇 방문은 비워둔다.
 CREATE TABLE IF NOT EXISTS iplog_tb (
     il_id      BIGINT       NOT NULL AUTO_INCREMENT COMMENT '방문 기록 ID',
     il_address VARCHAR(45)  NOT NULL COMMENT 'IP 주소',
@@ -12,6 +13,12 @@ CREATE TABLE IF NOT EXISTS iplog_tb (
     il_agent   VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'User-Agent',
     il_os      VARCHAR(50)  NOT NULL DEFAULT '' COMMENT 'OS',
     il_browser VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '브라우저',
+    il_country VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '국가',
+    il_region  VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '지역(도/광역시)',
+    il_city    VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '도시',
+    il_isp     VARCHAR(100) NOT NULL DEFAULT '' COMMENT '통신사(ISP)',
+    il_org     VARCHAR(100) NOT NULL DEFAULT '' COMMENT '회선/기관',
+    il_as      VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'AS 번호·이름',
     il_date    DATETIME     NOT NULL COMMENT '기록일',
     PRIMARY KEY (il_id),
     KEY idx_iplog_address (il_address),
@@ -26,3 +33,12 @@ ALTER TABLE iplog_tb
     ADD COLUMN IF NOT EXISTS il_agent   VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'User-Agent' AFTER il_path,
     ADD COLUMN IF NOT EXISTS il_os      VARCHAR(50)  NOT NULL DEFAULT '' COMMENT 'OS' AFTER il_agent,
     ADD COLUMN IF NOT EXISTS il_browser VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '브라우저' AFTER il_os;
+
+-- 지오로케이션 컬럼 (2026-10-14)
+ALTER TABLE iplog_tb
+    ADD COLUMN IF NOT EXISTS il_country VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '국가' AFTER il_browser,
+    ADD COLUMN IF NOT EXISTS il_region  VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '지역(도/광역시)' AFTER il_country,
+    ADD COLUMN IF NOT EXISTS il_city    VARCHAR(50)  NOT NULL DEFAULT '' COMMENT '도시' AFTER il_region,
+    ADD COLUMN IF NOT EXISTS il_isp     VARCHAR(100) NOT NULL DEFAULT '' COMMENT '통신사(ISP)' AFTER il_city,
+    ADD COLUMN IF NOT EXISTS il_org     VARCHAR(100) NOT NULL DEFAULT '' COMMENT '회선/기관' AFTER il_isp,
+    ADD COLUMN IF NOT EXISTS il_as      VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'AS 번호·이름' AFTER il_org;

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"gowoobro/global/geoip"
 	"gowoobro/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +19,7 @@ type visitRecorder struct {
 	notifies []models.Iplog
 }
 
-func (r *visitRecorder) record(item models.Iplog) {
+func (r *visitRecorder) record(item models.Iplog, bot bool) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	r.records = append(r.records, item)
@@ -231,5 +232,20 @@ func TestVisitLogSkipsPreflight(t *testing.T) {
 	records, notifies := recorder.counts()
 	if records != 0 || notifies != 0 {
 		t.Fatalf("records=%d notifies=%d, want 0/0 (OPTIONS 는 방문이 아니다)", records, notifies)
+	}
+}
+
+func TestVisitDetail(t *testing.T) {
+	full := models.Iplog{Address: "1.2.3.4", Path: "/api/projects", Os: "macOS 10.15.7", Browser: "Chrome 126"}
+	g := geoip.Info{Country: "South Korea", Region: "Seoul", City: "Seocho-gu", ISP: "Korea Telecom"}
+	want := "1.2.3.4\nSouth Korea · Seoul Seocho-gu · Korea Telecom\nmacOS 10.15.7 · Chrome 126\n/api/projects"
+	if got := visitDetail(full, g); got != want {
+		t.Errorf("visitDetail 전체 = %q, want %q", got, want)
+	}
+
+	// 지오·UA 를 모르면 그 줄 자체가 빠져야 한다 (빈 "·" 줄 금지)
+	bare := models.Iplog{Address: "1.2.3.4", Path: "/api/projects"}
+	if got := visitDetail(bare, geoip.Info{}); got != "1.2.3.4\n/api/projects" {
+		t.Errorf("visitDetail 최소 = %q", got)
 	}
 }

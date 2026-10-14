@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"gowoobro/global/geoip"
 	"gowoobro/global/log"
 	"gowoobro/global/ntfy"
 	"gowoobro/models"
@@ -76,8 +77,16 @@ func (n *notifyCache) shouldNotify(address string, now time.Time) bool {
 
 // recordVisit 는 iplog_tb 에 한 건 적재한다. 테스트에서 DB 없이 호출을 검증할 수
 // 있도록 변수로 뒀다. 기본 구현은 요청 처리를 막지 않게 고루틴에서 돈다.
-var recordVisit = func(item models.Iplog) {
+// 지오 조회(최대 5초)도 그 고루틴 안에서 한다. 봇은 IP 가 다양해 무료 한도만
+// 축내므로 지오 조회를 생략한다.
+var recordVisit = func(item models.Iplog, bot bool) {
 	go func() {
+		if !bot {
+			g := geoip.Lookup(item.Address)
+			item.Country, item.Region, item.City = g.Country, g.Region, g.City
+			item.Isp, item.Org, item.As = g.ISP, g.Org, g.AS
+		}
+
 		conn := models.NewConnection()
 		if conn == nil || !conn.IsConnect() {
 			log.Error().Str("address", item.Address).Msg("visitlog: database connection error")
@@ -95,17 +104,37 @@ var recordVisit = func(item models.Iplog) {
 }
 
 // notifyVisit 는 ntfy.sh 로 방문 알림을 보낸다(발송 자체는 global/ntfy).
-// 테스트에서 실제 발송 없이 검증할 수 있도록 변수로 뒀다.
+// 테스트에서 실제 발송 없이 검증할 수 있도록 변수로 뒀다. 지오 조회는
+// recordVisit 쪽과 중복될 수 있지만 캐시가 받아줘서 사실상 한 번이다.
 var notifyVisit = func(item models.Iplog) {
 	go func() {
-		detail := item.Address
-		if item.Os != "" || item.Browser != "" {
-			detail += " · " + strings.TrimSpace(strings.Trim(item.Os+" · "+item.Browser, " ·"))
-		}
-		detail += "\n" + item.Path
-
-		ntfy.Send("gowoobro 방문", detail, []string{"eyes"})
+		g := geoip.Lookup(item.Address)
+		ntfy.Send("gowoobro 방문", visitDetail(item, g), []string{"eyes"})
 	}()
+}
+
+// visitDetail 알림 본문: IP → 위치·통신사 → 기기 → 경로 순으로 아는 만큼만
+func visitDetail(item models.Iplog, g geoip.Info) string {
+	lines := []string{item.Address}
+	if geo := joinParts(" · ", g.Country, joinParts(" ", g.Region, g.City), g.ISP); geo != "" {
+		lines = append(lines, geo)
+	}
+	if dev := joinParts(" · ", item.Os, item.Browser); dev != "" {
+		lines = append(lines, dev)
+	}
+	lines = append(lines, item.Path)
+	return strings.Join(lines, "\n")
+}
+
+// joinParts 빈 문자열을 건너뛰고 구분자로 잇는다
+func joinParts(sep string, parts ...string) string {
+	var kept []string
+	for _, p := range parts {
+		if p = strings.TrimSpace(p); p != "" {
+			kept = append(kept, p)
+		}
+	}
+	return strings.Join(kept, sep)
 }
 
 // isInternalIP 는 사설 대역(RFC 1918)·루프백 주소인지 판정한다. gowoobro_web
@@ -142,7 +171,7 @@ func VisitLog(c *fiber.Ctx) error {
 	os, browser, bot := parseAgent(agent)
 	item := models.Iplog{Address: address, Path: c.Path(), Agent: agent, Os: os, Browser: browser}
 
-	recordVisit(item)
+	recordVisit(item, bot)
 
 	// 봇 크롤링까지 알리면 알림이 폭주하므로 사람 방문만 알린다.
 	if !bot && notified.shouldNotify(address, time.Now()) {

@@ -23,6 +23,12 @@ type Iplog struct {
 	Agent   string `json:"agent"`
 	Os      string `json:"os"`
 	Browser string `json:"browser"`
+	Country string `json:"country"` // 이하 지오로케이션 (ip-api, 영문) — 봇은 비워둔다
+	Region  string `json:"region"`  // 도/광역시 단위
+	City    string `json:"city"`
+	Isp     string `json:"isp"` // 통신사/회선
+	Org     string `json:"org"`
+	As      string `json:"as"` // 네트워크 AS 번호·이름
 	Date    string `json:"date"`
 }
 
@@ -76,14 +82,26 @@ func (p *IplogManager) Insert(item *Iplog) error {
 	if len(item.Browser) > 50 {
 		item.Browser = item.Browser[:50]
 	}
-
-	query := "insert into iplog_tb (il_address, il_path, il_agent, il_os, il_browser, il_date) values (?, ?, ?, ?, ?, ?)"
-
-	if p.Log {
-		log.Debug().Str("query", query).Any("param", []interface{}{item.Address, item.Path, item.Agent, item.Os, item.Browser, item.Date}).Msg("SQL")
+	// 지오 값은 ip-api 응답(영문 ASCII)이라 바이트 절단으로 충분하다.
+	for _, v := range []*string{&item.Country, &item.Region, &item.City} {
+		if len(*v) > 50 {
+			*v = (*v)[:50]
+		}
+	}
+	for _, v := range []*string{&item.Isp, &item.Org, &item.As} {
+		if len(*v) > 100 {
+			*v = (*v)[:100]
+		}
 	}
 
-	res, err := p.Conn.Exec(query, item.Address, item.Path, item.Agent, item.Os, item.Browser, item.Date)
+	query := "insert into iplog_tb (il_address, il_path, il_agent, il_os, il_browser, il_country, il_region, il_city, il_isp, il_org, il_as, il_date) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	params := []interface{}{item.Address, item.Path, item.Agent, item.Os, item.Browser, item.Country, item.Region, item.City, item.Isp, item.Org, item.As, item.Date}
+
+	if p.Log {
+		log.Debug().Str("query", query).Any("param", params).Msg("SQL")
+	}
+
+	res, err := p.Conn.Exec(query, params...)
 	if err != nil {
 		if p.Log {
 			log.Error().Str("error", err.Error()).Msg("SQL")
