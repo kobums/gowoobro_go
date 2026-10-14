@@ -6,6 +6,8 @@ import (
 	"gowoobro/global/log"
 
 	"database/sql"
+	"regexp"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -55,8 +57,33 @@ func Paging(page int, pagesize int) PagingType {
 	return PagingType{Page: page, Pagesize: pagesize}
 }
 
+// orderTerm 은 정렬 항목 하나("id", "p_date desc", "t.col asc")의 허용 형태다.
+var orderTerm = regexp.MustCompile(`(?i)^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)?(\s+(asc|desc))?$`)
+
+// sanitizeOrder 는 정렬 문자열에서 "컬럼 [asc|desc]" 나열과 rand() 만 통과시킨다.
+//
+// order by 절은 플레이스홀더로 바인딩할 수 없어 쿼리에 그대로 이어 붙는데, 이
+// 값은 공개 API 의 orderby 쿼리스트링에서 온다. 걸러내지 않으면 서브쿼리를 넣어
+// 다른 테이블 내용을 읽어낼 수 있다. 하나라도 형태가 어긋나면 통째로 버리고,
+// 빈 값은 각 매니저의 기본 정렬로 떨어진다.
+func sanitizeOrder(order string) string {
+	var terms []string
+	for _, term := range strings.Split(order, ",") {
+		term = strings.TrimSpace(term)
+		if term == "" {
+			continue
+		}
+		if !strings.EqualFold(term, "rand()") && !orderTerm.MatchString(term) {
+			return ""
+		}
+		terms = append(terms, term)
+	}
+
+	return strings.Join(terms, ", ")
+}
+
 func Ordering(order string) OrderingType {
-	return OrderingType{Order: order}
+	return OrderingType{Order: sanitizeOrder(order)}
 }
 
 func Limit(limit int) LimitType {
