@@ -61,7 +61,11 @@ func Http() {
 	router.SetRouter(app)
 
 	app.Get("/*", func(ctx *fiber.Ctx) error {
-		return ctx.SendFile(fmt.Sprintf("./%v/index.html", config.DocumentRoot), true)
+		// SendFile 의 오류를 그대로 돌려주면 응답 본문에 서버 내부 경로가 실린다.
+		if err := ctx.SendFile(fmt.Sprintf("./%v/index.html", config.DocumentRoot), true); err != nil {
+			return ctx.SendStatus(fiber.StatusNotFound)
+		}
+		return nil
 	})
 
 	c := make(chan os.Signal, 1)
