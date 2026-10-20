@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path"
 	"strings"
 	"syscall"
 
@@ -58,8 +59,14 @@ func Http() {
 	// 앱 로그(config.Log.File = webdata/log/...)는 UPLOAD_PATH 가 기본값 "webdata"
 	// 일 때 정적 서빙 디렉터리 안에 쌓인다. 관리자 로그인 IP 등이 담기므로
 	// /webdata/log 아래는 공개하지 않는다.
-	app.Use("/webdata/log", func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotFound)
+	// 접두사 라우팅(app.Use("/webdata/log"))은 원본 경로로 매칭돼
+	// "/webdata//log", "/webdata/./log", "/webdata/%6cog" 같은 변형으로 우회된다.
+	// 정적 서빙은 fasthttp 가 정규화·디코딩한 경로로 파일을 찾으므로 같은 경로로 검사한다.
+	app.Use(func(c *fiber.Ctx) error {
+		if isLogPath(string(c.Context().URI().Path())) {
+			return c.SendStatus(fiber.StatusNotFound)
+		}
+		return c.Next()
 	})
 
 	// app.Static("/webdata", config.DocumentRoot)
@@ -110,4 +117,11 @@ func Http() {
 			log.Error().Msg(err.Error())
 		}
 	}
+}
+
+// isLogPath 는 정규화된 요청 경로가 /webdata/log 아래인지 본다.
+// 대소문자를 무시하는 파일시스템(macOS 개발 환경)도 막도록 소문자로 비교한다.
+func isLogPath(p string) bool {
+	p = strings.ToLower(path.Clean("/" + p))
+	return p == "/webdata/log" || strings.HasPrefix(p, "/webdata/log/")
 }
