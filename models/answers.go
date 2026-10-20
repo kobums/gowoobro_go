@@ -277,56 +277,15 @@ func (p *AnswersManager) MakeQuery(initQuery string, postQuery string, initParam
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case Where:
-			item := v
-
-			if strings.Contains(item.Column, "_") {
-				query.WriteString(" and ")
-			} else {
-				query.WriteString(" and a_")
-			}
-			query.WriteString(item.Column)
-
-			if item.Compare == "in" {
-				query.WriteString(" in (")
-				query.WriteString(strings.Trim(strings.Replace(fmt.Sprint(item.Value), " ", ", ", -1), "[]"))
-				query.WriteString(")")
-			} else if item.Compare == "not in" {
-				query.WriteString(" not in (")
-				query.WriteString(strings.Trim(strings.Replace(fmt.Sprint(item.Value), " ", ", ", -1), "[]"))
-				query.WriteString(")")
-			} else if item.Compare == "between" {
-				if config.Database.Type == config.Postgresql {
-					query.WriteString(fmt.Sprintf(" between $%v and $%v", pos, pos+1))
-					pos += 2
-				} else {
-					query.WriteString(" between ? and ?")
-				}
-
-				s := item.Value.([2]string)
-				params = append(params, s[0])
-				params = append(params, s[1])
-			} else {
-				if config.Database.Type == config.Postgresql {
-					query.WriteString(" ")
-					query.WriteString(item.Compare)
-					query.WriteString(fmt.Sprintf(" $%v", pos))
-					pos++
-				} else {
-					query.WriteString(" ")
-					query.WriteString(item.Compare)
-					query.WriteString(" ?")
-				}
-				if item.Compare == "like" {
-					params = append(params, "%"+item.Value.(string)+"%")
-				} else {
-					params = append(params, item.Value)
-				}
-			}
+			clause, whereParams := WhereClause("a_", v, &pos)
+			query.WriteString(clause)
+			params = append(params, whereParams...)
 		case Custom:
 			item := v
 
 			query.WriteString(" and ")
 			query.WriteString(item.Query)
+			params = append(params, item.Params...)
 		}
 	}
 
@@ -607,56 +566,15 @@ func (p *AnswersManager) Find(args []interface{}) []Answers {
 			}
 			orderby = item.Order
 		case Where:
-			item := v
-
-			if strings.Contains(item.Column, "_") {
-				query.WriteString(" and ")
-			} else {
-				query.WriteString(" and a_")
-			}
-			query.WriteString(item.Column)
-
-			if item.Compare == "in" {
-				query.WriteString(" in (")
-				query.WriteString(strings.Trim(strings.Replace(fmt.Sprint(item.Value), " ", ", ", -1), "[]"))
-				query.WriteString(")")
-			} else if item.Compare == "not in" {
-				query.WriteString(" not in (")
-				query.WriteString(strings.Trim(strings.Replace(fmt.Sprint(item.Value), " ", ", ", -1), "[]"))
-				query.WriteString(")")
-			} else if item.Compare == "between" {
-				if config.Database.Type == config.Postgresql {
-					query.WriteString(fmt.Sprintf(" between $%v and $%v", pos, pos+1))
-					pos += 2
-				} else {
-					query.WriteString(" between ? and ?")
-				}
-
-				s := item.Value.([2]string)
-				params = append(params, s[0])
-				params = append(params, s[1])
-			} else {
-				if config.Database.Type == config.Postgresql {
-					query.WriteString(" ")
-					query.WriteString(item.Compare)
-					query.WriteString(fmt.Sprintf(" $%v", pos))
-					pos++
-				} else {
-					query.WriteString(" ")
-					query.WriteString(item.Compare)
-					query.WriteString(" ?")
-				}
-				if item.Compare == "like" {
-					params = append(params, "%"+item.Value.(string)+"%")
-				} else {
-					params = append(params, item.Value)
-				}
-			}
+			clause, whereParams := WhereClause("a_", v, &pos)
+			query.WriteString(clause)
+			params = append(params, whereParams...)
 		case Custom:
 			item := v
 
 			query.WriteString(" and ")
 			query.WriteString(item.Query)
+			params = append(params, item.Params...)
 		case Base:
 			item := v
 
