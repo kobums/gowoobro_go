@@ -276,11 +276,11 @@ func Init() {
 		Database.Password = envDBPass
 	}
 
-	envTlsCert := strings.ToUpper(os.Getenv("TLS_CERT"))
+	envTlsCert := strings.TrimSpace(os.Getenv("TLS_CERT")) // file path: keep case as-is
 	if envTlsCert != "" {
 		Tls.Cert = envTlsCert
 	}
-	envTlsKey := strings.ToUpper(os.Getenv("TLS_KEY"))
+	envTlsKey := strings.TrimSpace(os.Getenv("TLS_KEY")) // file path: keep case as-is
 	if envTlsKey != "" {
 		Tls.Key = envTlsKey
 	}
