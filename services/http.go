@@ -55,6 +55,13 @@ func Http() {
 		Level: compress.LevelBestCompression,
 	}))
 
+	// 앱 로그(config.Log.File = webdata/log/...)는 UPLOAD_PATH 가 기본값 "webdata"
+	// 일 때 정적 서빙 디렉터리 안에 쌓인다. 관리자 로그인 IP 등이 담기므로
+	// /webdata/log 아래는 공개하지 않는다.
+	app.Use("/webdata/log", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNotFound)
+	})
+
 	// app.Static("/webdata", config.DocumentRoot)
 	app.Static("/webdata", config.UploadPath)
 
