@@ -35,7 +35,7 @@ func newAuthApp() *fiber.App {
 	api.Post("/login", Login)
 
 	ok := func(c *fiber.Ctx) error { return c.SendString("ok") }
-	for _, p := range []string{"/projects", "/projects/:id", "/questions", "/answers", "/ipblock", "/upload/index"} {
+	for _, p := range []string{"/projects", "/projects/:id", "/questions", "/answers", "/ipblock", "/upload/index", "/legaldocs", "/legaldocs/:id"} {
 		api.Get(p, ok)
 		api.Post(p, ok)
 		api.Put(p, ok)
@@ -52,11 +52,13 @@ func TestPublicPathsNeedNoToken(t *testing.T) {
 
 	// 공개 사이트가 실제로 쓰는 호출들. 하나라도 401 이면 사이트가 깨진다.
 	public := []struct{ method, path string }{
-		{http.MethodGet, "/api/projects"},     // 메인 SSR
-		{http.MethodGet, "/api/projects/3"},   // 앱 상세
-		{http.MethodPost, "/api/questions"},   // 방문자 질문 등록
-		{http.MethodGet, "/api/answers"},      // FAB 답변 조회
-		{http.MethodOptions, "/api/projects"}, // CORS 프리플라이트
+		{http.MethodGet, "/api/projects"},          // 메인 SSR
+		{http.MethodGet, "/api/projects/3"},        // 앱 상세
+		{http.MethodPost, "/api/questions"},        // 방문자 질문 등록
+		{http.MethodGet, "/api/answers"},           // FAB 답변 조회
+		{http.MethodOptions, "/api/projects"},      // CORS 프리플라이트
+		{http.MethodGet, "/api/legaldocs/current"}, // 약관 페이지 SSR
+		{http.MethodGet, "/api/legaldocs/7"},       // 약관 이전 버전
 	}
 
 	for _, tt := range public {
@@ -89,6 +91,12 @@ func TestProtectedPathsRequireToken(t *testing.T) {
 		{http.MethodPost, "/api/upload/index"}, // 파일 업로드
 		{http.MethodGet, "/api/ipblock"},       // 차단 목록 열람
 		{http.MethodDelete, "/api/questions"},
+		{http.MethodGet, "/api/legaldocs"},  // 시행 전 초안이 섞인 전체 목록
+		{http.MethodGet, "/api/legaldocs/"}, // 끝 슬래시로 우회 시도
+		{http.MethodPost, "/api/legaldocs"},
+		{http.MethodPut, "/api/legaldocs"},
+		{http.MethodDelete, "/api/legaldocs"},
+		{http.MethodPost, "/api/legaldocs/7"},
 	}
 
 	for _, tt := range protected {
