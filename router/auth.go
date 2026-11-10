@@ -49,6 +49,12 @@ func isPublicPath(method, path string) bool {
 	case method == http.MethodGet && strings.HasPrefix(path, "/api/projects/"):
 		return true
 
+	// 약관·개인정보 처리방침 페이지(SSR). 스토어 심사와 앱 내 링크가 로그인 없이
+	// 열어야 한다. 프로젝트별 전체 목록(GET /api/legaldocs)은 시행 전 초안이
+	// 섞여 있으므로 열지 않는다 — 접두어가 아니라 하위 경로만 통과시킨다.
+	case method == http.MethodGet && strings.HasPrefix(path, "/api/legaldocs/"):
+		return true
+
 	// 방문자의 질문 등록. 목록 조회(GET)는 관리자만 볼 수 있어야 하므로 제외.
 	case method == http.MethodPost && path == "/api/questions":
 		return true

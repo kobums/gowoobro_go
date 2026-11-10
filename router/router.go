@@ -98,5 +98,6 @@ func SetRouter(r *fiber.App) {
 	routers.SetupQuestionsRoutes(apiGroup)
 	routers.SetupAnswersRoutes(apiGroup)
 	routers.SetupProjectsRoutes(apiGroup)
+	routers.SetupLegaldocRoutes(apiGroup)
 	routers.SetupUploadRoutes(apiGroup)
 }
