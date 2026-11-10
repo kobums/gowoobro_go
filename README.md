@@ -122,6 +122,19 @@ gowoobrogo/
 > `answers_tb.a_question`은 `questions_tb.q_id`의 FK입니다.  
 > GET 응답에 `questionText` 필드가 자동으로 포함됩니다 (LEFT JOIN).
 
+### 📜 Legal Docs — `/api/legaldocs`
+
+약관·개인정보 처리방침. 등록하면 gowoobro_web 이 `/{lang}/app/{프로젝트 id}/{type}` 페이지로 그려준다. 스키마는 `migrations/legaldoc_tb.sql`.
+
+| Method | Endpoint | 설명 |
+|:---:|:---|:---|
+| `GET` | `/api/legaldocs/current?project=&type=&lang=` | 시행 중인 문서 + 버전 목록 (공개, 해당 언어가 없으면 `ko`) |
+| `GET` | `/api/legaldocs/:id` | 특정 버전 (공개, 시행된 것만) |
+| `GET` | `/api/legaldocs?project=` | 시행 전 포함 전체 (관리자) |
+| `POST` | `/api/legaldocs` | 새 버전 등록 — 버전 번호는 서버가 매긴다 (관리자) |
+| `PUT` | `/api/legaldocs` | 시행 전 버전 수정 (관리자, 시행 후에는 409) |
+| `DELETE` | `/api/legaldocs` | 시행 전 버전 삭제 (관리자, 시행 후에는 409) |
+
 ### 📤 Upload — `/api/upload`
 
 | Method | Endpoint | 설명 |
